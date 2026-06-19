@@ -1,0 +1,248 @@
+#include "Playlist.h"
+#include <iostream>
+#include <string>
+#include <fstream>
+using namespace std;
+
+Playlist::Playlist(){
+	head = nullptr;
+	tail = nullptr;
+	size = 0;
+}
+
+bool Playlist::isEmpty() const{
+	return size == 0;
+}
+
+int Playlist::getSize() const{
+	return size;
+}
+
+void Playlist::clear(){
+	if (head == nullptr) return;
+	Node* current = head;
+	Node* nextNode = nullptr;
+	do{
+		nextNode = current->next;
+		delete current;
+		current = nextNode;
+	} while (current != head);
+	head = nullptr;
+	tail = nullptr;
+	size = 0;
+}
+
+void Playlist::addSong(const Song&song){
+	loadFromFile();
+	Node* newNode = new Node(song);
+	if (head == nullptr){
+		head = newNode;
+		tail = newNode;
+		newNode->next = newNode;
+	}
+	else{
+		tail->next= newNode;
+		newNode->next = head;
+		tail = newNode;
+	}
+	size++;
+	saveToFile();
+}
+
+void Playlist::displayPlaylist() const{
+	const_cast<Playlist*>(this)->loadFromFile();
+	
+	if (head == nullptr){
+		cout<<"PlayList is empty!"<<endl;
+		return;
+	}
+	Node* current = head;
+	int index = 1;
+	
+	do{
+		cout<< index << "." << current->data.getTitle() << " - " << current->data.getArtist() << " - " << current->data.getDuration() <<"s"<< endl;
+		current = current->next;
+		index++;
+	} while (current != head);
+}
+
+void Playlist::updateSong(int position){
+	loadFromFile();
+	if (head == nullptr){
+	cout<<"PlayList is empty!"<<endl;
+	return;
+	}
+	
+	if(position < 1 || position > size){
+		cout << "Invalid position!" << endl;
+        return;
+	}
+	
+	Node* current = head;
+	for(int i = 1; i < position; i++){
+		current = current->next;
+	}
+	int choice;
+	cout << "-------------Update Song-------------" << endl;
+	cout << "1. Update Title" << endl;
+    cout << "2. Update Artist" << endl;
+    cout << "3. Update Duration" << endl;
+    cout << "Choose: ";
+    cin >> choice;
+    cin.ignore();
+    
+    switch (choice){
+    	 case 1:
+        {
+            string newTitle;
+            cout << "Enter new title: ";
+            getline(cin, newTitle);
+            current->data.setTitle(newTitle);
+            break;
+        }
+
+        case 2:
+        {
+            string newArtist;
+            cout << "Enter new artist: ";
+            getline(cin, newArtist);
+            current->data.setArtist(newArtist);
+            break;
+        }
+
+        case 3:
+        {
+            int newDuration;
+            cout << "Enter new duration (seconds): ";
+            cin >> newDuration;
+            current->data.setDuration(newDuration);
+            break;
+        }
+        default:
+            cout << "Invalid choice!" << endl;
+            return;
+	}
+	saveToFile();
+	cout << "=> Update done" << endl;
+}
+
+void Playlist::removeSong(int position){
+	loadFromFile();
+    if (head == nullptr) {
+        cout << "Playlist is empty!" << endl;
+        return;
+    }
+
+    if (position < 1 || position > size) {
+        cout << "Invalid position!" << endl;
+        return;
+    }
+
+    Node* temp = nullptr;
+    
+    if (position == 1) {
+        temp = head;
+        if (size == 1) {
+            head = nullptr;
+            tail = nullptr;
+        } else {
+            head = head->next;
+            tail->next = head; 
+        }
+        delete temp;
+    } 
+
+    else {
+        Node* current = head;
+        for (int i = 1; i < position - 1; i++) {
+            current = current->next;
+        }
+        temp = current->next;
+        current->next = temp->next;
+        if (temp == tail) {
+            tail = current;
+        }
+        delete temp;
+    }
+    size--;
+    saveToFile(); 
+    cout << "=> Remove song success! " << endl;
+}
+
+void Playlist::searchSong(const string& keyword){
+	loadFromFile();
+	if (head == nullptr){
+		cout << "Playlist is empty!" << endl;
+		return;
+	}
+	
+	Node* current = head;
+	bool found = false;
+	cout << "The keyword is : " << keyword << endl;
+	do{
+		if(current->data.getArtist().find(keyword)!= string::npos || current->data.getTitle().find(keyword)!= string::npos){ // tìm thấy làm tiếp bên trong
+			cout << current->data.getTitle() << " - " << current->data.getArtist() << " - " << current->data.getDuration() << endl;
+			found = true;
+		}
+		current = current->next;
+	} while(current != head);
+	if(!found){
+        cout << "No songs were found that match the keywords you entered!" << endl;
+	}
+}
+
+void Playlist::loadFromFile() {
+    clear();
+    ifstream inFile("playlist.txt");
+    if (!inFile) return;
+
+    string line;
+    while (getline(inFile, line)) {
+        if (line.empty()) continue;
+
+        size_t pos1 = line.find('|');
+        size_t pos2 = line.find('|', pos1 + 1);
+
+        if (pos1 != string::npos && pos2 != string::npos) {
+            string title = line.substr(0, pos1);
+            string artist = line.substr(pos1 + 1, pos2 - pos1 - 1);
+            int duration = stoi(line.substr(pos2 + 1));
+
+            Node* newNode = new Node(Song(title, artist, duration));
+            if (head == nullptr) {
+                head = newNode;
+                tail = newNode;
+                newNode->next = newNode;
+            } else {
+                tail->next = newNode;
+                newNode->next = head;
+                tail = newNode;
+            }
+            size++;
+        }
+    }
+    inFile.close();
+}
+
+void Playlist::saveToFile() const {
+    ofstream outFile("playlist.txt");
+    if (!outFile) return;
+
+    if (head == nullptr) {
+        outFile.close();
+        return;
+    }
+
+    Node* current = head;
+    do {
+        outFile << current->data.getTitle() << "|"
+                << current->data.getArtist() << "|"
+                << current->data.getDuration() << endl;
+        current = current->next;
+    } while (current != head);
+    outFile.close();
+}
+
+void playSong(int position);
+void nextSong();
+void previousSong();
