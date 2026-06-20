@@ -20,7 +20,8 @@ void showMenu() {
 int main() {
     Playlist myPlaylist; 
     int choice;
-
+	myPlaylist.loadFromFile();
+	
     do {
         showMenu();
         if (!(cin >> choice)) {
@@ -90,6 +91,7 @@ int main() {
                 break;
             }
             case 0:
+            	myPlaylist.saveToFile();	
                 cout << "Dang thoat chuong trinh. Tam biet!\n";
                 break;
             default:

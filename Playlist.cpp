@@ -8,6 +8,7 @@ Playlist::Playlist(){
 	head = nullptr;
 	tail = nullptr;
 	size = 0;
+	currentTrack = nullptr;
 }
 
 bool Playlist::isEmpty() const{
@@ -30,28 +31,28 @@ void Playlist::clear(){
 	head = nullptr;
 	tail = nullptr;
 	size = 0;
+	currentTrack = nullptr;
 }
 
 void Playlist::addSong(const Song&song){
-	loadFromFile();
 	Node* newNode = new Node(song);
 	if (head == nullptr){
 		head = newNode;
 		tail = newNode;
 		newNode->next = newNode;
+		newNode->prev = newNode;
 	}
 	else{
 		tail->next= newNode;
 		newNode->next = head;
+		newNode->prev = tail;
+		head->prev = newNode;
 		tail = newNode;
 	}
 	size++;
-	saveToFile();
 }
 
 void Playlist::displayPlaylist() const{
-	const_cast<Playlist*>(this)->loadFromFile();
-	
 	if (head == nullptr){
 		cout<<"PlayList is empty!"<<endl;
 		return;
@@ -67,7 +68,6 @@ void Playlist::displayPlaylist() const{
 }
 
 void Playlist::updateSong(int position){
-	loadFromFile();
 	if (head == nullptr){
 	cout<<"PlayList is empty!"<<endl;
 	return;
@@ -122,12 +122,10 @@ void Playlist::updateSong(int position){
             cout << "Invalid choice!" << endl;
             return;
 	}
-	saveToFile();
 	cout << "=> Update done" << endl;
 }
 
 void Playlist::removeSong(int position){
-	loadFromFile();
     if (head == nullptr) {
         cout << "Playlist is empty!" << endl;
         return;
@@ -165,12 +163,10 @@ void Playlist::removeSong(int position){
         delete temp;
     }
     size--;
-    saveToFile(); 
     cout << "=> Remove song success! " << endl;
 }
 
 void Playlist::searchSong(const string& keyword){
-	loadFromFile();
 	if (head == nullptr){
 		cout << "Playlist is empty!" << endl;
 		return;
@@ -192,7 +188,6 @@ void Playlist::searchSong(const string& keyword){
 }
 
 void Playlist::loadFromFile() {
-    clear();
     ifstream inFile("playlist.txt");
     if (!inFile) return;
 

@@ -6,6 +6,7 @@ class Node{
 	public:
 		Song data;
 		Node* next;
+		Node* prev;
 		
 		Node(const Song& song);
 };

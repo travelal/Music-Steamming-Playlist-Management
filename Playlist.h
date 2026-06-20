@@ -8,6 +8,7 @@ class Playlist{
 		Node* head;
 		Node* tail;
 		int size;
+		Node* currentTrack;
 	public:
 		Playlist();
 		
