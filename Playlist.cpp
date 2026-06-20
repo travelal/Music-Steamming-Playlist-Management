@@ -11,6 +11,10 @@ Playlist::Playlist(){
 	currentTrack = nullptr;
 }
 
+Playlist::~Playlist(){
+	clear();
+}
+
 bool Playlist::isEmpty() const{
 	return size == 0;
 }
@@ -145,8 +149,10 @@ void Playlist::removeSong(int position){
             tail = nullptr;
         } else {
             head = head->next;
-            tail->next = head; 
+            head->prev = tail;
+            tail->next = head;
         }
+        if (currentTrack == temp) currentTrack = nullptr;
         delete temp;
     } 
 
@@ -157,9 +163,11 @@ void Playlist::removeSong(int position){
         }
         temp = current->next;
         current->next = temp->next;
+        temp->next->prev = current;
         if (temp == tail) {
             tail = current;
         }
+        if (currentTrack == temp) currentTrack = nullptr;
         delete temp;
     }
     size--;
@@ -203,17 +211,7 @@ void Playlist::loadFromFile() {
             string artist = line.substr(pos1 + 1, pos2 - pos1 - 1);
             int duration = stoi(line.substr(pos2 + 1));
 
-            Node* newNode = new Node(Song(title, artist, duration));
-            if (head == nullptr) {
-                head = newNode;
-                tail = newNode;
-                newNode->next = newNode;
-            } else {
-                tail->next = newNode;
-                newNode->next = head;
-                tail = newNode;
-            }
-            size++;
+            addSong(Song(title, artist, duration));
         }
     }
     inFile.close();
@@ -238,6 +236,52 @@ void Playlist::saveToFile() const {
     outFile.close();
 }
 
-void playSong(int position);
-void nextSong();
-void previousSong();
+void Playlist::playSong(int position) {
+    if (head == nullptr) {
+        cout << "Playlist is empty!" << endl;
+        return;
+    }
+    if (position < 1 || position > size) {
+        cout << "Invalid position!" << endl;
+        return;
+    }
+
+    Node* current = head;
+    for (int i = 1; i < position; i++) {
+        current = current->next;
+    }
+    currentTrack = current;
+    cout << "=> Now playing: " << current->data.getTitle()
+         << " - " << current->data.getArtist()
+         << " (" << current->data.getDuration() << "s)" << endl;
+}
+
+void Playlist::nextSong() {
+    if (head == nullptr) {
+        cout << "Playlist is empty!" << endl;
+        return;
+    }
+    if (currentTrack == nullptr) {
+        currentTrack = head;
+    } else {
+        currentTrack = currentTrack->next;
+    }
+    cout << "=> Now playing: " << currentTrack->data.getTitle()
+         << " - " << currentTrack->data.getArtist()
+         << " (" << currentTrack->data.getDuration() << "s)" << endl;
+}
+
+void Playlist::previousSong() {
+    if (head == nullptr) {
+        cout << "Playlist is empty!" << endl;
+        return;
+    }
+    if (currentTrack == nullptr) {
+        currentTrack = tail;
+    } else {
+        currentTrack = currentTrack->prev;
+    }
+    cout << "=> Now playing: " << currentTrack->data.getTitle()
+         << " - " << currentTrack->data.getArtist()
+         << " (" << currentTrack->data.getDuration() << "s)" << endl;
+}
