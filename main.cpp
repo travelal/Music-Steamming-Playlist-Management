@@ -4,18 +4,18 @@ using namespace std;
 
 void showMenu() {
     cout << "\n========== MENU ==========" << endl;
-    cout << "1. Them bai hat" << endl;
-    cout << "2. Hien thi playlist" << endl;
-    cout << "3. Cap nhat bai hat" << endl;
-    cout << "4. Xoa bai hat" << endl;
-    cout << "5. Tim kiem bai hat" << endl;
-    cout << "6. Phat bai hat" << endl;
-    cout << "7. Bai hat tiep theo" << endl;
-    cout << "8. Bai hat truoc do" << endl;
-    cout << "9. Luu vao file" << endl;
-    cout << "10. Tai tu file" << endl;
-    cout << "0. Thoat" << endl;
-    cout << "Lua chon: ";
+    cout << "1. Add Song" << endl;
+    cout << "2. Show the Playlist" << endl;
+    cout << "3. Update Song" << endl;
+    cout << "4. Remove Song" << endl;
+    cout << "5. Search Song for Playlist" << endl;
+    cout << "6. Play Song" << endl;
+    cout << "7. Next Song" << endl;
+    cout << "8. Previous Song" << endl;
+    cout << "9. Save To File" << endl;
+    cout << "10. Load To File" << endl;
+    cout << "0. Exit" << endl;
+    cout << "Your Choice: ";
 }
 
 int main() {
@@ -32,13 +32,15 @@ int main() {
             case 1: {
                 string title, artist;
                 int duration;
-                cout << "Ten bai hat: ";
+                cout << "The title Song: ";
                 getline(cin, title);
-                cout << "Ca si: ";
+                cout << "The Artist : ";
                 getline(cin, artist);
-                cout << "Thoi luong (giay): ";
+                cout << "Duration (s): ";
                 cin >> duration;
                 playlist.addSong(Song(title, artist, duration));
+                cout << "Add Song successfully." << endl;
+                playlist.saveToFile();
                 break;
             }
             case 2:
@@ -46,28 +48,30 @@ int main() {
                 break;
             case 3: {
                 int pos;
-                cout << "Vi tri can cap nhat: ";
+                cout << "Location need update(1 - " << playlist.getSize() << ") :";
                 cin >> pos;
                 playlist.updateSong(pos);
+                playlist.saveToFile();
                 break;
             }
             case 4: {
                 int pos;
-                cout << "Vi tri can xoa: ";
+                cout << "Location need remove(1 - " << playlist.getSize() << ") :";
                 cin >> pos;
                 playlist.removeSong(pos);
+                playlist.saveToFile();
                 break;
             }
             case 5: {
                 string keyword;
-                cout << "Tu khoa tim kiem: ";
+                cout << "Keyword to Search: ";
                 getline(cin, keyword);
                 playlist.searchSong(keyword);
                 break;
             }
             case 6: {
                 int pos;
-                cout << "Vi tri bai hat can phat: ";
+                cout << "Vi tri bai hat can phat(1 - " << playlist.getSize() << ") :";
                 cin >> pos;
                 playlist.playSong(pos);
                 break;
@@ -80,19 +84,20 @@ int main() {
                 break;
             case 9:
                 playlist.saveToFile();
-                cout << "=> Da luu vao file!" << endl;
+                cout << "=> Save to file successfully!" << endl;
                 break;
             case 10:
                 playlist.clear();
                 playlist.loadFromFile();
-                cout << "=> Da tai lai tu file!" << endl;
+                cout << "=> Load file successfully!" << endl;
+                playlist.displayPlaylist();
                 break;
             case 0:
                 playlist.saveToFile();
-                cout << "Tam biet!" << endl;
+                cout << "Sir, have a nice day and chill your days !" << endl;
                 break;
             default:
-                cout << "Lua chon khong hop le!" << endl;
+                cout << "Invalid Choice" << endl;
         }
     } while (choice != 0);
 

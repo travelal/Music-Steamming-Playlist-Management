@@ -182,10 +182,11 @@ void Playlist::searchSong(const string& keyword){
 	
 	Node* current = head;
 	bool found = false;
+	int index = 1;
 	cout << "The keyword is : " << keyword << endl;
 	do{
 		if(current->data.getArtist().find(keyword)!= string::npos || current->data.getTitle().find(keyword)!= string::npos){ // tìm thấy làm tiếp bên trong
-			cout << current->data.getTitle() << " - " << current->data.getArtist() << " - " << current->data.getDuration() << endl;
+			cout << index <<". "<< current->data.getTitle() << " - " << current->data.getArtist() << " - " << current->data.getDuration() << endl;
 			found = true;
 		}
 		current = current->next;
