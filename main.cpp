@@ -4,17 +4,20 @@ using namespace std;
 
 void showMenu() {
     cout << "\n========== MENU ==========" << endl;
-    cout << "1. Them bai hat" << endl;
-    cout << "2. Hien thi playlist" << endl;
-    cout << "3. Cap nhat bai hat" << endl;
-    cout << "4. Xoa bai hat" << endl;
-    cout << "5. Tim kiem bai hat" << endl;
-    cout << "6. Phat bai hat" << endl;
-    cout << "7. Bai hat tiep theo" << endl;
-    cout << "8. Bai hat truoc do" << endl;
-    cout << "9. Luu vao file" << endl;
-    cout << "10. Tai tu file" << endl;
-    cout << "0. Thoat" << endl;
+    cout << "1. Add Song To Playlist" << endl;
+    cout << "2. Show playlist" << endl;
+    cout << "3. Update Song" << endl;
+    cout << "4. Remove Song from the Playlist" << endl;
+    cout << "5. Search From Playlist" << endl;
+    cout << "6. Play Song" << endl;
+    cout << "7. The Next Song" << endl;
+    cout << "8. The Previous Song" << endl;
+    cout << "9. Save To File" << endl;
+    cout << "10. Load From File" << endl;
+    // FIX: them 2 chuc nang lich su
+    cout << "11. View Play History" << endl;
+    cout << "12. Go Back (Previous Played)" << endl;
+    cout << "0. Quit" << endl;
     cout << "Lua chon: ";
 }
 
@@ -32,11 +35,11 @@ int main() {
             case 1: {
                 string title, artist;
                 int duration;
-                cout << "Ten bai hat: ";
+                cout << "Name of Song: ";
                 getline(cin, title);
-                cout << "Ca si: ";
+                cout << "The Artist: ";
                 getline(cin, artist);
-                cout << "Thoi luong (giay): ";
+                cout << "Duration (s): ";
                 cin >> duration;
                 playlist.addSong(Song(title, artist, duration));
                 break;
@@ -46,28 +49,28 @@ int main() {
                 break;
             case 3: {
                 int pos;
-                cout << "Vi tri can cap nhat: ";
+                cout << "Location need update: (1 -> " << playlist.getSize() << "): ";
                 cin >> pos;
                 playlist.updateSong(pos);
                 break;
             }
             case 4: {
                 int pos;
-                cout << "Vi tri can xoa: ";
+                cout << "Location need remove: (1 -> " << playlist.getSize() << "): ";
                 cin >> pos;
                 playlist.removeSong(pos);
                 break;
             }
             case 5: {
                 string keyword;
-                cout << "Tu khoa tim kiem: ";
+                cout << "Search for keyword: ";
                 getline(cin, keyword);
                 playlist.searchSong(keyword);
                 break;
             }
             case 6: {
                 int pos;
-                cout << "Vi tri bai hat can phat: ";
+                cout << "Song Want to Play (1 -> " << playlist.getSize() << "): ";
                 cin >> pos;
                 playlist.playSong(pos);
                 break;
@@ -80,19 +83,27 @@ int main() {
                 break;
             case 9:
                 playlist.saveToFile();
-                cout << "=> Da luu vao file!" << endl;
+                cout << "=> Save To File Successfully!" << endl;
                 break;
             case 10:
                 playlist.clear();
                 playlist.loadFromFile();
-                cout << "=> Da tai lai tu file!" << endl;
+                cout << "=> Load From File Successfully!" << endl;
+                playlist.displayPlaylist();
+                break;
+            // FIX: them 2 case moi
+            case 11:
+                playlist.viewHistory();
+                break;
+            case 12:
+                playlist.goBack();
                 break;
             case 0:
                 playlist.saveToFile();
-                cout << "Tam biet!" << endl;
+                cout << "Bye! Have a good day, sir!" << endl;
                 break;
             default:
-                cout << "Lua chon khong hop le!" << endl;
+                cout << "Invalid choice!" << endl;
         }
     } while (choice != 0);
 

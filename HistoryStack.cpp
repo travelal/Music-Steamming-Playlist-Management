@@ -37,13 +37,13 @@ void HistoryStack::displayHistory() const {
         return;
     }
 
-    // std::stack has no iterator, so we copy it to walk top-to-bottom
-    // without disturbing the real stack.
+    // std::stack khong co iterator, copy ra de duyet tu tren xuong
+    // ma khong thay doi stack that.
     std::stack<Song> copy = historyStack;
     int index = 1;
     while (!copy.empty()) {
         std::cout << "  " << index << ". ";
-        copy.top().displayInfo();
+        copy.top().displayInfo();   // goi Song::displayInfo() da them o Song.cpp
         copy.pop();
         index++;
     }

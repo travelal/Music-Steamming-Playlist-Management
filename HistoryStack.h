@@ -3,25 +3,17 @@
 
 #include "Song.h"
 #include <stack>
-#include <vector>
 
 // =====================================================================
 // Class: HistoryStack
-// Source: Topic brief (image) - "Stack: Quan ly lich su 'Recently
-//         Played' (vua nghe xong) de quay lai." (Stack manages the
-//         'Recently Played' history so the user can go back.)
-//         Report 1 - 1.2.1 #6 Play History Management:
-//         "LIFO stack mechanism using std::stack<Song*> ... push() on
-//         playback initiation; top()/pop() yielding O(1) tracking."
-//         Report 3 - 3.2 Conceptual Framework: Stack handles the
-//         'Back' feature in parallel with the CDLL playlist.
+// Stack quan ly lich su "Recently Played" de quay lai.
+// LILO stack: push() khi bat dau phat; top()/pop() khi "Go Back".
 //
-// NOTE: this is intentionally a SEPARATE structure from the CDLL's
-// prev pointer. CDLL Next/Previous move through playlist ORDER;
-// the Stack instead remembers the ACTUAL sequence of songs that were
-// played (which matters once Shuffle is enabled), so "Back" always
-// returns to what the user truly heard last - not just the previous
-// node in the list.
+// NOTE: Day la cau truc RIENG BIET voi CDLL's prev pointer.
+// CDLL Next/Previous di chuyen theo THU TU PLAYLIST;
+// Stack nay nho TRINH TU THUC TE cac bai da phat (quan trong khi
+// Shuffle bat), nen "Back" luon quay ve bai nguoi dung thuc su nghe
+// lan cuoi - khong phai node lien ke trong danh sach.
 // =====================================================================
 class HistoryStack {
 private:
@@ -34,8 +26,7 @@ public:
     bool isEmpty() const;
     int size() const;
 
-    // Prints the "Recently Played" list (most recent first) without
-    // mutating the stack.
+    // In danh sach "Recently Played" (moi nhat truoc) khong lam thay doi stack.
     void displayHistory() const;
 };
 

@@ -8,7 +8,7 @@ class Song {
 private:
     string title;
     string artist;
-    int duration; // tính theo số giây
+    int duration; // tinh theo so giay
 
 public:
     Song();
@@ -21,6 +21,9 @@ public:
     void setTitle(const string& t);
     void setArtist(const string& a);
     void setDuration(int d);
+
+    // Dung boi HistoryStack::displayHistory() de in thong tin bai hat
+    void displayInfo() const;
 };
 
 #endif
