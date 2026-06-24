@@ -2,12 +2,16 @@
 #define PLAYLIST_H
 
 #include "Song.h"
-#include "HistoryStack.h"   // FIX: them include de dung HistoryStack
+#include "HistoryStack.h"
+#include "ForwardStack.h"   // NEW: needed for go-forward navigation
 #include <string>
 using namespace std;
 
 class Playlist {
 private:
+    // ---------------------------------------------------------------
+    // CDLL node — unchanged from original
+    // ---------------------------------------------------------------
     struct Node {
         Song data;
         Node* next;
@@ -20,8 +24,14 @@ private:
     Node* currentTrack;
     int size;
 
-    // FIX: them member history de theo doi cac bai da phat
+    // ---------------------------------------------------------------
+    // History system
+    //   history : LIFO stack of every song played (most recent = top)
+    //   forward : LIFO stack of songs moved aside by Go Back;
+    //             cleared whenever a "new direction" action happens
+    // ---------------------------------------------------------------
     HistoryStack history;
+    ForwardStack forward;   // NEW
 
 public:
     Playlist();
@@ -40,13 +50,13 @@ public:
     void loadFromFile();
     void saveToFile() const;
 
-    void playSong(int position);
-    void nextSong();
-    void previousSong();
+    void playSong(int position);    // clears ForwardStack
+    void nextSong();                // clears ForwardStack
+    void previousSong();            // clears ForwardStack
 
-    // FIX: them 2 method moi cho tinh nang lich su phat nhac
-    void viewHistory() const;   // hien thi danh sach recently played
-    void goBack();              // quay lai bai truoc theo lich su thuc te
+    void viewHistory() const;
+    void goBack();      // moves current from HistoryStack -> ForwardStack
+    void goForward();   // NEW: moves top of ForwardStack -> HistoryStack
 };
 
-#endif
+#endif // PLAYLIST_H
