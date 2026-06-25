@@ -1,5 +1,8 @@
 #include "Playlist.h"
 #include <iostream>
+#include <iomanip>
+#include <algorithm>
+#include <cctype>
 #include <string>
 #include <fstream>
 using namespace std;
@@ -56,21 +59,38 @@ void Playlist::addSong(const Song&song){
 	size++;
 }
 
-void Playlist::displayPlaylist() const{
-	if (head == nullptr){
-		cout<<"PlayList is empty!"<<endl;
-		return;
-	}
-	Node* current = head;
-	int index = 1;
-	
-	do{
-		cout<< index << "." << current->data.getTitle() << " - " << current->data.getArtist() << " - " << current->data.getDuration() <<"s"<< endl;
-		current = current->next;
-		index++;
-	} while (current != head);
-}
+void Playlist::displayPlaylist() const {
+    if (head == nullptr) {
+        cout << "Playlist is empty!" << endl;
+        return;
+    }
 
+    // 1. In tiêu đề bảng (Độ rộng các cột: STT=6, Title=30, Artist=25, Duration=12)
+    cout << "\n========================================================================\n";
+    cout << left << setw(6)  << "#" 
+         << setw(30) << "Title" 
+         << setw(25) << "Artist" 
+         << setw(12) << "Duration" << endl;
+    cout << "------------------------------------------------------------------------\n";
+
+    Node* current = head;
+    int index = 1;
+    
+    // 2. In từng dòng dữ liệu căn thẳng hàng với tiêu đề
+    do {
+        string durationStr = to_string(current->data.getDuration()) + "s"; // Ghép chữ "s" vào giây
+        
+        cout << left << setw(6)  << index 
+             << setw(30) << current->data.getTitle() 
+             << setw(25) << current->data.getArtist() 
+             << setw(12) << durationStr << endl;
+             
+        current = current->next;
+        index++;
+    } while (current != head);
+
+    cout << "========================================================================\n\n";
+}
 void Playlist::updateSong(int position){
 	if (head == nullptr){
 	cout<<"PlayList is empty!"<<endl;
@@ -174,25 +194,42 @@ void Playlist::removeSong(int position){
     cout << "=> Remove song success! " << endl;
 }
 
+string toLowerCase(string str) {
+    transform(str.begin(), str.end(), str.begin(), [](unsigned char c) {
+        return tolower(c);
+    });
+    return str;
+}
+
 void Playlist::searchSong(const string& keyword){
-	if (head == nullptr){
-		cout << "Playlist is empty!" << endl;
-		return;
-	}
-	
-	Node* current = head;
-	bool found = false;
-	cout << "The keyword is : " << keyword << endl;
-	do{
-		if(current->data.getArtist().find(keyword)!= string::npos || current->data.getTitle().find(keyword)!= string::npos){ // tìm thấy làm tiếp bên trong
-			cout << current->data.getTitle() << " - " << current->data.getArtist() << " - " << current->data.getDuration() << endl;
-			found = true;
-		}
-		current = current->next;
-	} while(current != head);
-	if(!found){
+    if (head == nullptr){
+        cout << "Playlist is empty!" << endl;
+        return;
+    }
+    
+    string lowerKeyword = toLowerCase(keyword);
+    
+    Node* current = head;
+    bool found = false;
+    int index = 1;
+    cout << "The keyword is : " << keyword << endl;
+    
+    do {
+        string lowerArtist = toLowerCase(current->data.getArtist());
+        string lowerTitle = toLowerCase(current->data.getTitle());
+        
+        if(lowerArtist.find(lowerKeyword) != string::npos || lowerTitle.find(lowerKeyword) != string::npos){
+            cout << current->data.getTitle() << " - " << current->data.getArtist() << " - " << current->data.getDuration() << endl;
+            found = true;
+        }
+        
+        index++;
+        current = current->next;
+    } while(current != head);
+    
+    if(!found){
         cout << "No songs were found that match the keywords you entered!" << endl;
-	}
+    }
 }
 
 void Playlist::loadFromFile() {
