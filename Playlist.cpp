@@ -65,7 +65,6 @@ void Playlist::displayPlaylist() const {
         return;
     }
 
-    // 1. In tiêu đề bảng (Độ rộng các cột: STT=6, Title=30, Artist=25, Duration=12)
     cout << "\n========================================================================\n";
     cout << left << setw(6)  << "#" 
          << setw(30) << "Title" 
@@ -76,10 +75,8 @@ void Playlist::displayPlaylist() const {
     Node* current = head;
     int index = 1;
     
-    // 2. In từng dòng dữ liệu căn thẳng hàng với tiêu đề
     do {
-        string durationStr = to_string(current->data.getDuration()) + "s"; // Ghép chữ "s" vào giây
-        
+        string durationStr = to_string(current->data.getDuration()) + "s";
         cout << left << setw(6)  << index 
              << setw(30) << current->data.getTitle() 
              << setw(25) << current->data.getArtist() 
@@ -287,6 +284,13 @@ void Playlist::playSong(int position) {
     for (int i = 1; i < position; i++) {
         current = current->next;
     }
+    
+    while (!forwardStack.empty()) forwardStack.pop();
+    
+    if(currentTrack != nullptr){
+    	historyStack.push(currentTrack->data);
+	}
+	
     currentTrack = current;
     cout << "=> Now playing: " << current->data.getTitle()
          << " - " << current->data.getArtist()
@@ -298,9 +302,13 @@ void Playlist::nextSong() {
         cout << "Playlist is empty!" << endl;
         return;
     }
+    
+	while (!forwardStack.empty()) forwardStack.pop();
+      
     if (currentTrack == nullptr) {
         currentTrack = head;
     } else {
+    	historyStack.push(currentTrack->data);
         currentTrack = currentTrack->next;
     }
     cout << "=> Now playing: " << currentTrack->data.getTitle()
@@ -313,12 +321,100 @@ void Playlist::previousSong() {
         cout << "Playlist is empty!" << endl;
         return;
     }
+
+    while (!forwardStack.empty()) forwardStack.pop();
+      
     if (currentTrack == nullptr) {
         currentTrack = tail;
     } else {
+    	historyStack.push(currentTrack->data);
         currentTrack = currentTrack->prev;
     }
     cout << "=> Now playing: " << currentTrack->data.getTitle()
          << " - " << currentTrack->data.getArtist()
          << " (" << currentTrack->data.getDuration() << "s)" << endl;
+}
+
+void Playlist::displayRecentlyPlayed() const{
+	stack<Song> fullTimeline = historyStack;
+	
+	if (currentTrack != nullptr) {
+        fullTimeline.push(currentTrack->data); //hiện tại
+    }
+    
+    stack<Song> tempForward = forwardStack; 
+    while (!tempForward.empty()) {             //Nạp Tương lai lên trên cùng
+        fullTimeline.push(tempForward.top());
+        tempForward.pop();
+    }
+    
+    if (fullTimeline.empty()) {
+        cout << "=> History is empty!" << endl;
+        return;
+    }
+
+    cout << "\n================ RECENTLY PLAYED ================\n";
+    cout << left << setw(6)  << "#" 
+         << setw(30) << "Title" 
+         << setw(25) << "Artist" << endl;
+    cout << "-------------------------------------------------\n";
+
+    int index = 1;
+    // Bắt đầu in từ trên cùng của fullTimeline (bài hát mới nhất)
+    while (!fullTimeline.empty() && index <= 15) {
+        Song s = fullTimeline.top();
+        
+        // Thêm dấu sao (*) cho bài hát đang phát hiện tại
+        string indicator = (currentTrack != nullptr && 
+                            s.getTitle() == currentTrack->data.getTitle() && 
+                            s.getArtist() == currentTrack->data.getArtist()) ? " (*)" : "";
+                            
+        cout << left << setw(6)  << index 
+             << setw(30) << (s.getTitle() + indicator) 
+             << setw(25) << s.getArtist() << endl;
+        
+        fullTimeline.pop();
+        index++;
+    }
+    cout << "  (*) : Currently playing\n";
+    cout << "=================================================\n\n";
+}
+
+void Playlist::backtoLastPlayed() {
+    if (historyStack.empty()) {
+        cout << "=> No previous song in history to go back to!" << endl;
+        return;
+    }
+    
+    if (currentTrack != nullptr) {
+        forwardStack.push(currentTrack->data);
+    }
+    
+    Song lastPlayed = historyStack.top();
+    historyStack.pop();
+
+    if (head == nullptr) return;
+    
+    Node* current = head;
+    bool found = false;
+    do {
+        if (current->data.getTitle() == lastPlayed.getTitle() && 
+            current->data.getArtist() == lastPlayed.getArtist()) {
+            
+ 
+            currentTrack = current;
+            found = true;
+            break;
+        }
+        current = current->next;
+    } while (current != head);
+
+    if (found) {
+        cout << "=> (Back) Now playing: " << currentTrack->data.getTitle()
+             << " - " << currentTrack->data.getArtist()
+             << " (" << currentTrack->data.getDuration() << "s)" << endl;
+    } else {
+        cout << "=> Cannot play! The song '" << lastPlayed.getTitle() 
+             << "' was removed from the playlist." << endl;
+    }
 }

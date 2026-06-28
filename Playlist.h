@@ -3,6 +3,7 @@
 
 #include "Song.h"
 #include <string>
+#include <stack>
 using namespace std;
 
 class Playlist {
@@ -18,6 +19,9 @@ private:
     Node* tail;
     Node* currentTrack;
     int size;
+    
+    stack<Song> historyStack;
+	stack<Song> forwardStack;
 
 public:
     Playlist();
@@ -39,6 +43,10 @@ public:
     void playSong(int position);
     void nextSong();
     void previousSong();
+    
+    //history
+    void displayRecentlyPlayed() const;
+    void backtoLastPlayed();
 };
 
 #endif

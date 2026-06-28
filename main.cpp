@@ -14,6 +14,8 @@ void showMenu() {
     cout << "8. Previous Song" << endl;
     cout << "9. Save To File" << endl;
     cout << "10. Load To File" << endl;
+    cout << "11. Show Recently Played" << endl;
+    cout << "12. Back to Last Played" << endl;
     cout << "0. Exit" << endl;
     cout << "Your Choice: ";
 }
@@ -93,6 +95,11 @@ int main() {
                 cout << "=> Load file successfully!" << endl;
                 playlist.displayPlaylist();
                 break;
+            case 11:
+            	playlist.displayRecentlyPlayed();
+            	break;
+            case 12:
+            	playlist.backtoLastPlayed();
             case 0:
                 playlist.saveToFile();
                 cout << "Sir, have a nice day and chill your days !" << endl;
