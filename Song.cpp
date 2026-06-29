@@ -28,4 +28,4 @@ void Song::setArtist(const string& a){
 }
 void Song::setDuration(int d){
 	this->duration = d;
-    }
+}
