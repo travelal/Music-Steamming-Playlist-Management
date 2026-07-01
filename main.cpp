@@ -40,14 +40,27 @@ int main() {
                 getline(cin, artist);
                 cout << "Duration (s): ";
                 cin >> duration;
-                playlist.addSong(Song(title, artist, duration));
-                cout << "Add Song successfully." << endl;
+                
+                // Bắt buộc phải có dòng này để xóa ký tự xuống dòng (\n) sót lại sau khi nhập số duration
+                cin.ignore(); 
+        
+                Song newSong(title, artist, duration);
+                
+                // Vòng lặp: Nếu bài hát bị trùng (addSong trả về false), bắt nhập lại title
+                while (!playlist.addSong(newSong)) {
+                    cout << "Please enter a different title: ";
+                    getline(cin, title);
+                    newSong.setTitle(title); // Cập nhật lại title mới cho bài hát
+                }
+                
+                cout << "=> Add Song successfully." << endl;
                 playlist.saveToFile();
                 break;
             }
-            case 2:
+            case 2:{
                 playlist.displayPlaylist();
                 break;
+			}
             case 3: {
                 int pos;
                 cout << "Location need update(1 - " << playlist.getSize() << ") :";
@@ -79,31 +92,44 @@ int main() {
                 playlist.playSong(pos);
                 break;
             }
-            case 7:
+            case 7:{
                 playlist.nextSong();
                 break;
-            case 8:
+			}
+            case 8:{
                 playlist.previousSong();
                 break;
-            case 9:
+            }
+            case 9:{
                 playlist.saveToFile();
                 cout << "=> Save to file successfully!" << endl;
                 break;
-            case 10:
-                playlist.clear();
-                playlist.loadFromFile();
-                cout << "=> Load file successfully!" << endl;
-                playlist.displayPlaylist();
-                break;
-            case 11:
+            }
+            case 10: {
+    			playlist.clear();  // Xóa playlist cũ
+    			playlist.loadFromFile();  // Load playlist mới (đã sửa để giữ lịch sử)
+    			cout << "\n Load file successfully! (" << playlist.getSize() << " songs loaded)" << endl;
+    			if (playlist.getSize() > 0) {
+        			cout << " History preserved!" << endl;
+        			playlist.displayPlaylist();
+    			} else {
+        			cout << " Playlist file is empty or not found!" << endl;
+    			}
+    			break;
+			}
+            case 11:{
             	playlist.displayRecentlyPlayed();
             	break;
-            case 12:
+            }
+            case 12:{
             	playlist.backtoLastPlayed();
-            case 0:
+            	break;
+            }
+            case 0:{
                 playlist.saveToFile();
                 cout << "Sir, have a nice day and chill your days !" << endl;
                 break;
+            }
             default:
                 cout << "Invalid Choice" << endl;
         }

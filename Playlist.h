@@ -14,14 +14,15 @@ private:
         Node* prev;
         Node(const Song& s) : data(s), next(nullptr), prev(nullptr) {}
     };
-
-    Node* head;
+    
+	Node* head;
     Node* tail;
     Node* currentTrack;
     int size;
     
     stack<Song> historyStack;
 	stack<Song> forwardStack;
+	bool isSongExists(const Song& song) const;
 
 public:
     Playlist();
@@ -30,8 +31,8 @@ public:
     bool isEmpty() const;
     int getSize() const;
     void clear();
-
-    void addSong(const Song& song);
+    
+    bool addSong(const Song& song);
     void displayPlaylist() const;
     void updateSong(int position);
     void removeSong(int position);
